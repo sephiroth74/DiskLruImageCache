@@ -119,28 +119,29 @@ public final class DiskLruImageCache {
 
 	private void writeMetadata (
 			DiskLruCache.Editor editor, Parcelable metadata ) throws IOException {
-		OutputStream oos = null;
+		OutputStream output = null;
 		try {
+			final Parcel parcel = Parcel.obtain();
+			parcel.writeParcelable( metadata, 0 );
+			byte[] bytes = parcel.marshall();
+			parcel.recycle();
 
-			final Parcel p1 = Parcel.obtain();
-			p1.writeParcelable( metadata, 0 );
-			byte[] bytes = p1.marshall();
-			p1.recycle();
-
-			oos = editor.newOutputStream( METADATA_INDEX );
-			oos.write( bytes );
+			output = editor.newOutputStream( METADATA_INDEX );
+			output.write( bytes );
 
 		} finally {
-			IOUtils.closeQuietly( oos );
+			if( null != output ) {
+				IOUtils.closeQuietly( output );
+			}
 		}
 	}
 
 	private <T extends Parcelable> T readMetadata ( DiskLruCache.Snapshot snapshot, Class<T> cls ) throws IOException, ClassNotFoundException {
-		InputStream ois = null;
+		InputStream input = null;
 		Parcel parcel = null;
 		try {
-			ois = snapshot.getInputStream( METADATA_INDEX );
-			byte[] bytes = IOUtils.toByteArray( ois );
+			input = snapshot.getInputStream( METADATA_INDEX );
+			byte[] bytes = IOUtils.toByteArray( input );
 
 			parcel = Parcel.obtain();
 			parcel.unmarshall( bytes, 0, bytes.length );
@@ -149,8 +150,8 @@ public final class DiskLruImageCache {
 			return parcel.readParcelable( cls.getClassLoader() );
 
 		} finally {
-			if( null != ois ) {
-				IOUtils.closeQuietly( ois );
+			if( null != input ) {
+				IOUtils.closeQuietly( input );
 			}
 
 			if( null != parcel ) {
