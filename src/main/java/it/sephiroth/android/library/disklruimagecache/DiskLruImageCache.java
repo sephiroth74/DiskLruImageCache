@@ -39,7 +39,7 @@ public final class DiskLruImageCache {
 	}
 
 	public <T extends Parcelable> BitmapEntry<T> get ( final String key, Class<T> metadataClass ) throws ClassNotFoundException {
-		Log.i( LOG_TAG, "get: " + key );
+		// Log.i( LOG_TAG, "get: " + key );
 		DiskLruCache.Snapshot snapshot = null;
 		try {
 			snapshot = mDiskCache.get( makeKey( key ) );
@@ -63,7 +63,7 @@ public final class DiskLruImageCache {
 	}
 
 	public <T extends Parcelable> boolean put ( final String key, BitmapEntry<T> bitmap, Bitmap.CompressFormat format, int quality ) throws IOException {
-		Log.i( LOG_TAG, "put: " + key );
+		// Log.i( LOG_TAG, "put: " + key );
 
 		DiskLruCache.Editor editor = null;
 		try {
@@ -76,7 +76,7 @@ public final class DiskLruImageCache {
 			writeMetadata( editor, bitmap.getMetadata() );
 
 			if( write( editor, bitmap.getBitmap(), format, quality ) ) {
-				Log.d( LOG_TAG, "flushing..." );
+				// Log.d( LOG_TAG, "flushing..." );
 				mDiskCache.flush();
 				editor.commit();
 				return true;
@@ -86,7 +86,6 @@ public final class DiskLruImageCache {
 			}
 		} catch( IOException e ) {
 			e.printStackTrace();
-			Log.e( LOG_TAG, "put failed", e );
 
 			try {
 				if( null != editor ) {
@@ -147,7 +146,11 @@ public final class DiskLruImageCache {
 			parcel.unmarshall( bytes, 0, bytes.length );
 			parcel.setDataPosition( 0 );
 
-			return parcel.readParcelable( cls.getClassLoader() );
+			if(null != cls) {
+				return parcel.readParcelable( cls.getClassLoader() );
+			} else {
+				return null;
+			}
 
 		} finally {
 			if( null != input ) {
@@ -165,12 +168,12 @@ public final class DiskLruImageCache {
 	}
 
 	public void remove ( final String key ) throws IOException {
-		Log.i( LOG_TAG, "remove: " + key );
+		// Log.i( LOG_TAG, "remove: " + key );
 		mDiskCache.remove( makeKey( key ) );
 	}
 
 	public boolean containsKey ( String key ) {
-		Log.i( LOG_TAG, "containsKey: " + key );
+		// Log.i( LOG_TAG, "containsKey: " + key );
 
 		DiskLruCache.Snapshot snapshot = null;
 		try {
