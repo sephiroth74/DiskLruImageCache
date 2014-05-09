@@ -107,7 +107,7 @@ public final class DiskLruImageCache {
 		OutputStream out = null;
 
 		try {
-			out = new BufferedOutputStream( editor.newOutputStream( BITMAP_INDEX ), Utils.IO_BUFFER_SIZE );
+			out = new BufferedOutputStream( editor.newOutputStream( BITMAP_INDEX ), DiskUtils.IO_BUFFER_SIZE );
 			return bitmap.compress( format, quality, out );
 		} finally {
 			if( null != out ) {
@@ -223,11 +223,14 @@ public final class DiskLruImageCache {
 
 		final String storageState = Environment.getExternalStorageState();
 		final File cacheDir;
-		if( Environment.MEDIA_CHECKING.equals( storageState ) || Environment.MEDIA_MOUNTED.equals( storageState ) || ! Utils.isExternalStorageRemovable() ) {
-			cacheDir = Utils.getExternalCacheDir( context );
+		if( Environment.MEDIA_CHECKING.equals( storageState ) || Environment.MEDIA_MOUNTED.equals( storageState ) || ! DiskUtils
+			.isExternalStorageRemovable() ) {
+			cacheDir = DiskUtils.getExternalCacheDir(context);
 		} else {
 			cacheDir = context.getCacheDir();
 		}
+
+		Log.i(LOG_TAG, "cacheDir:" + cacheDir.getAbsolutePath());
 
 		return new File( cacheDir, name );
 	}

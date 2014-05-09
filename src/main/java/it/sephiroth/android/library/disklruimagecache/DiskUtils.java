@@ -6,7 +6,7 @@ import android.os.Environment;
 
 import java.io.File;
 
-class Utils {
+public class DiskUtils {
 	public static final int IO_BUFFER_SIZE = 8 * 1024;
 
 	public static boolean isExternalStorageRemovable() {
